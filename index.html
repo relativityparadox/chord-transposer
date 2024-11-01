@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Transposer</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2022.12.1/pyscript.css">
+    <script defer src="https://pyscript.net/releases/2022.12.1/pyscript.js"></script>
+</head>
+<body>
+    <h1>Chord Transposer</h1>
+    <p>(c) 2024 [] - Licensed under the MIT License</p>
+    <div>
+        <label for="input">Enter the chords separated by spaces:</label>
+        <input type="text" id="input">
+    </div>
+    <div>
+        <label for="steps">Enter the number of semitones to transpose (positive or negative):</label>
+        <input type="number" id="steps">
+    </div>
+    <button onclick="transpose()">Transpose</button>
+    <button onclick="project_info()">Info</button>
+    <p>Original Chords: <span id="original"></span></p>
+    <p>Transposed Chords: <span id="transposed"></span></p>
+
+    <py-script>
+        note_to_number = {
+            'A': 1, 'A#': 2, 'Bb': 2, 'B': 3, 'C': 4, 'C#': 5, 'Db': 5,
+            'D': 6, 'D#': 7, 'Eb': 7, 'E': 8, 'F': 9, 'F#': 10, 'Gb': 10,
+            'G': 11, 'G#': 12, 'Ab': 12
+        }
+        number_to_note = {v: k for k, v in note_to_number.items()}
+
+        def convert_notes_to_numbers(note_list):
+            return [note_to_number.get(note, note) for note in note_list]
+
+        def convert_numbers_to_notes(number_list):
+            return [number_to_note.get(num, num) if isinstance(num, int) else num for num in number_list]
+
+        def transpose_notes(note_list, steps):
+            number_list = convert_notes_to_numbers(note_list)
+            transposed_list = [
+                (num + steps - 1) % 12 + 1 if isinstance(num, int) else num for num in number_list
+            ]
+            return convert_numbers_to_notes(transposed_list)
+
+        def list_to_string(lst):
+            return ' '.join(lst)
+
+        def project_info():
+            info = (
+                "Version: 0.2.0\n"
+                "This project transposes musical chords by converting them to numbers, "
+                "adding or subtracting a specified number of semitones, and then converting "
+                "them back to chords. Non-convertible strings are left unchanged. "
+                "You can input the chords and the number of semitones interactively.\n"
+                "MIT License:\n"
+                "Copyright (c) 2024 []\n"
+                "Permission is hereby granted, free of charge, to any person obtaining a copy "
+                "of this software and associated documentation files (the \"Software\"), to deal "
+                "in the Software without restriction, including without limitation the rights "
+                "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell "
+                "copies of the Software, and to permit persons to whom the Software is "
+                "furnished to do so, subject to the following conditions:\n"
+                "The above copyright notice and this permission notice shall be included in all "
+                "copies or substantial portions of the Software.\n"
+                "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR "
+                "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, "
+                "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE "
+                "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER "
+                "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, "
+                "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE "
+                "SOFTWARE.\n"
+            )
+            print(info)
+
+        def transpose():
+            input_string = Element("input").element.value
+            steps = int(Element("steps").element.value)
+            input_list = input_string.split()
+            transposed_list = transpose_notes(input_list, steps)
+            result_string = list_to_string(transposed_list)
+            Element("original").element.innerText = input_string
+            Element("transposed").element.innerText = result_string
+    </py-script>
+</body>
+</html>
